@@ -7,9 +7,11 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function show(User $user)
+	public function __construct(protected readonly UserService $userService) {}
+
+    public function show(User $user): JsonResponse
     {
-        //
+        return response()->json($user);
     }
 
     public function update(Request $request, User $user)
@@ -17,8 +19,8 @@ class UserController extends Controller
         //
     }
 
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user): JsonResponse
     {
-        //
+        return $this->userService->deleteUser($request, $user);
     }
 }
