@@ -11,6 +11,7 @@ class UserService {
 
 	public function deleteUser(Request $request, User $user): JsonResponse
 	{
+	    Auth::guard('web')->logout();
 		$request->session()->invalidate();
 		$request->session()->regenerateToken();
 
