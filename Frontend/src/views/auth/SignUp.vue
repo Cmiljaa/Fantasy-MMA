@@ -6,7 +6,6 @@ import useAuthForm from '../../composables/useAuth'
 // import { useAuth } from '../../composables/useAuth'
 
 const showPassword = ref(false)
-const showConfirmPassword = ref(false)
 
 const agreeToTerms = ref(false)
 
@@ -51,58 +50,32 @@ const v$ = useVuelidate(rules, formData)
 				<form class="space-y-5" @submit.prevent="submitRegister">
 
 
-					<!-- Name Fields -->
+					<!-- Username Field -->
 
-					<div class="grid grid-cols-2 gap-4">
-
-
-						<div>
-
-							<label for="firstName" class="block text-sm font-medium text-gray-300 mb-2">
-								First name
-							</label>
-
-
-							<input id="firstName" v-model="formData.firstName" type="text"
-								class="w-full px-4 py-3 bg-[#202020] border border-[#303030] rounded-xl text-white placeholder-gray-500 transition-all duration-200 focus:outline-none focus:border-[#DC2626] focus:ring-2 focus:ring-[#DC2626]/20">
-
-
-							<p v-if="v$.firstName.$error" class="text-red-500 text-sm mt-2">
-								{{ v$.firstName.$errors[0].$message }}
-							</p>
-
-
-							<p v-else-if="errors.firstName" class="text-red-500 text-sm mt-2">
-								{{ errors.firstName[0] }}
-							</p>
-
-						</div>
-
+					<div class="grid grid-cols-1 gap-4">
 
 
 						<div>
 
-							<label for="lastName" class="block text-sm font-medium text-gray-300 mb-2">
-								Last name
+							<label for="username" class="block text-sm font-medium text-gray-300 mb-2">
+								Username
 							</label>
 
 
-							<input id="lastName" v-model="formData.lastName" type="text"
+							<input id="username" v-model="formData.username" type="text"
 								class="w-full px-4 py-3 bg-[#202020] border border-[#303030] rounded-xl text-white placeholder-gray-500 transition-all duration-200 focus:outline-none focus:border-[#DC2626] focus:ring-2 focus:ring-[#DC2626]/20">
 
 
-							<p v-if="v$.lastName.$error" class="text-red-500 text-sm mt-2">
-								{{ v$.lastName.$errors[0].$message }}
+							<p v-if="v$.username?.$error" class="text-red-500 text-sm mt-2">
+								{{ v$.username.$errors[0].$message }}
 							</p>
 
 
-							<p v-else-if="errors.lastName" class="text-red-500 text-sm mt-2">
-								{{ errors.lastName[0] }}
+							<p v-else-if="errors.username" class="text-red-500 text-sm mt-2">
+								{{ errors.username[0] }}
 							</p>
-
 
 						</div>
-
 
 					</div>
 					<!-- Email -->
@@ -157,7 +130,7 @@ const v$ = useVuelidate(rules, formData)
 
 
 						<p class="text-xs text-gray-500 mt-2">
-							At least 8 characters with uppercase, lowercase and numbers
+							At least 8 characters
 						</p>
 
 
@@ -186,21 +159,13 @@ const v$ = useVuelidate(rules, formData)
 
 						<div class="relative">
 
-							<input id="confirmPassword" v-model="formData.repeatPassword"
-								:type="showConfirmPassword ? 'text' : 'password'"
+							<input id="confirmPassword" v-model="formData.repeatPassword" type="password"
 								class="w-full px-4 py-3 bg-[#202020] border border-[#303030] rounded-xl text-white placeholder-gray-500 transition-all duration-200 focus:outline-none focus:border-[#DC2626] focus:ring-2 focus:ring-[#DC2626]/20">
-
-
-							<button type="button" @click="showConfirmPassword = !showConfirmPassword"
-								:aria-label="showConfirmPassword ? 'Hide password' : 'Show password'"
-								class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300 cursor-pointer transition-colors duration-200 text-sm">
-								{{ showConfirmPassword ? 'Hide' : 'Show' }}
-							</button>
 
 						</div>
 
 
-						<p v-if="v$.repeatPassword.$error" class="text-red-500 text-sm mt-2">
+						<p v-if="v$.repeatPassword?.$error" class="text-red-500 text-sm mt-2">
 							{{ v$.repeatPassword.$errors[0].$message }}
 						</p>
 
@@ -217,12 +182,8 @@ const v$ = useVuelidate(rules, formData)
 							class="mt-1 w-5 h-5 bg-[#202020] border border-[#303030] rounded cursor-pointer accent-[#DC2626]">
 
 
-						<label for="terms" class="text-sm text-gray-400 cursor-pointer">
-							I agree to the Terms of Service and understand the
-							<span class="text-[#DC2626]">
-								fantasy contests
-							</span>
-							involve competition
+						<label for="terms" class="text-sm text-gray-400 cursor-pointer mt-1">
+							I agree to the Terms of Service for <span>fantasy contests</span>
 						</label>
 
 					</div>
