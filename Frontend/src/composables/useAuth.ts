@@ -7,22 +7,10 @@ import {
 	helpers,
 } from '@vuelidate/validators'
 
+import type { SignInForm, SignUpForm } from '../interfaces/Auth'
+
 
 type AuthMethod = 'signup' | 'signin'
-
-
-type SignUpForm = {
-	username: string
-	email: string
-	password: string
-	repeatPassword: string
-}
-
-
-type SignInForm = {
-	email: string
-	password: string
-}
 
 
 type FormData<T extends AuthMethod> =
@@ -33,6 +21,10 @@ type FormData<T extends AuthMethod> =
 
 type FormErrors = Record<string, string[]>
 
+type BackendErrorResponse = {
+	message?: string
+	errors?: FormErrors
+}
 
 
 export default function useAuthForm<T extends AuthMethod>(method: T) {
@@ -55,6 +47,7 @@ export default function useAuthForm<T extends AuthMethod>(method: T) {
 
 
 	const errors = ref<FormErrors>({})
+	const authError = ref<string | null>(null)
 
 
 
@@ -176,41 +169,60 @@ export default function useAuthForm<T extends AuthMethod>(method: T) {
 
 
 
+	function shouldShowGeneralAuthError(message?: string, fieldErrors: FormErrors = {}): boolean {
+		const authMessage = 'These credentials do not match our records.'
+		const fieldMessage = Object.values(fieldErrors).flat().find((errorMessage) => errorMessage === authMessage)
 
-	function setErrors(error: unknown) {
+		return method === 'signin' && (message === authMessage || Boolean(fieldMessage))
+	}
+
+	function setErrors(error: unknown): void {
 
 
 		const axiosError = error as {
 			response?: {
 				status?: number
-				data?: {
-					errors?: FormErrors
-				}
+				data?: BackendErrorResponse
 			}
 		}
 
-
+		const responseMessage = axiosError.response?.data?.message
+		const fieldErrors = axiosError.response?.data?.errors ?? {}
 
 		if (axiosError.response?.status === 422) {
+			const filteredErrors = Object.entries(fieldErrors).reduce((acc, [field, messages]) => {
+				const normalizedMessages = (messages ?? []).filter((messageText) => {
+					if (method === 'signin' && messageText === 'These credentials do not match our records.') {
+						return false
+					}
 
+					return true
+				})
 
-			errors.value = axiosError.response.data?.errors ?? {}
+				if (normalizedMessages.length > 0) {
+					acc[field] = normalizedMessages
+				}
 
+				return acc
+			}, {} as FormErrors)
+
+			errors.value = filteredErrors
+			authError.value = shouldShowGeneralAuthError(responseMessage, fieldErrors)
+				? 'Invalid email or password.'
+				: null
 
 			return
-
 		}
 
-
-
 		errors.value = {}
-
+		authError.value = shouldShowGeneralAuthError(responseMessage, fieldErrors)
+			? 'Invalid email or password.'
+			: null
 	}
 
-	function clearErrors() {
-
+	function clearErrors(): void {
 		errors.value = {}
-
+		authError.value = null
 	}
 
 
@@ -224,6 +236,8 @@ export default function useAuthForm<T extends AuthMethod>(method: T) {
 		rules,
 
 		errors,
+		
+		authError,
 
 		setErrors,
 
