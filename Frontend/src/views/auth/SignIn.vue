@@ -3,6 +3,8 @@ import { ref } from 'vue'
 import useVuelidate from '@vuelidate/core'
 
 import useAuthForm from '../../composables/useAuth'
+import { login } from '../../services/authService'
+import router from '../../router'
 
 const showPassword = ref(false)
 const rememberMe = ref(false)
@@ -11,6 +13,7 @@ const {
 	formData,
 	rules,
 	errors,
+	authError,
 	setErrors,
 	clearErrors
 } = useAuthForm('signin')
@@ -18,6 +21,9 @@ const {
 
 const v$ = useVuelidate(rules, formData)
 
+		setErrors(error)
+	}
+}
 </script>
 
 
@@ -61,7 +67,7 @@ const v$ = useVuelidate(rules, formData)
 
 
 						<!-- Laravel error -->
-						<p v-else-if="errors.email" class="text-red-500 text-sm mt-2">
+						<p v-else-if="errors.email?.[0]" class="text-red-500 text-sm mt-2">
 							{{ errors.email[0] }}
 						</p>
 
@@ -99,7 +105,7 @@ const v$ = useVuelidate(rules, formData)
 
 
 						<!-- Laravel error -->
-						<p v-else-if="errors.password" class="text-red-500 text-sm mt-2">
+						<p v-else-if="errors.password?.[0]" class="text-red-500 text-sm mt-2">
 							{{ errors.password[0] }}
 						</p>
 
@@ -130,6 +136,11 @@ const v$ = useVuelidate(rules, formData)
 
 
 
+
+					<p v-if="authError"
+						class="mt-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+						{{ authError }}
+					</p>
 
 					<!-- Sign In Button -->
 					<button type="submit"
